@@ -1,5 +1,6 @@
 package com.adira.contact.controller;
 
+import com.adira.contact.common.Utils;
 import com.adira.contact.dto.UserDTO;
 import com.adira.contact.pojo.ApiResponse;
 import com.adira.contact.pojo.User;
@@ -7,23 +8,22 @@ import com.adira.contact.service.UserService;
 
 import jakarta.validation.Valid;
 
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/v1/users")
 public class UserController {
 
     @Autowired
     private UserService userService;
+
+    private Utils utils = new Utils();
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> getUserById(@PathVariable Long id) {
@@ -44,36 +44,39 @@ public class UserController {
     @PostMapping
     public ResponseEntity<ApiResponse<?>> createUser(@Valid @RequestBody User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            // Handle validation errors
-            List<String> errors = new ArrayList<>();
-            for (ObjectError error : bindingResult.getAllErrors()) {
-                errors.add(error.getDefaultMessage());
-            }
-            ApiResponse<List<String>> apiResponse = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(),
-                    "Validation failed",
-                    "API", errors);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
+            return utils.handleValidationErrors(bindingResult);
+        }
+
+        if (userService.doesUserExistByEmail(user.getEmail())) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(HttpStatus.BAD_REQUEST.value(),
+                    "User with this email already exists", "API", null));
         }
 
         User createdUser = userService.createUser(user);
 
         if (createdUser != null) {
-            ApiResponse<User> apiResponse = new ApiResponse<>(HttpStatus.CREATED.value(), "User created", "API",
-                    createdUser);
-            return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+            UserDTO userDTO = convertToDTO(createdUser);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new ApiResponse<>(HttpStatus.CREATED.value(), "User created", "API", userDTO));
         } else {
-            ApiResponse<User> apiResponse = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    "Failed to create user", "API", null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to create user", "API",
+                            null));
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-        User updatedUser = userService.updateUser(id, user);
-        return updatedUser != null ? new ResponseEntity<>(updatedUser, HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<ApiResponse<String>> updateUser(@PathVariable Long id, @RequestBody User user) throws BadRequestException {
+        String updatedUserMessage = userService.updateUser(id, user);
+    
+        if (updatedUserMessage != null) {
+            ApiResponse<String> apiResponse = new ApiResponse<>(HttpStatus.CREATED.value(), updatedUserMessage, "API", null);
+            return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(HttpStatus.NOT_FOUND.value(), "User not found", "API", null));
+        }
     }
+    
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
@@ -84,4 +87,6 @@ public class UserController {
     private UserDTO convertToDTO(User user) {
         return new UserDTO(user.getId(), user.getEmail(), user.isAdmin());
     }
+
+
 }

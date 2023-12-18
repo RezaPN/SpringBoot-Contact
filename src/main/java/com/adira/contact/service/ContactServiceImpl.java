@@ -1,6 +1,6 @@
 package com.adira.contact.service;
 
-import com.adira.contact.exception.ContactNotFoundException;
+import com.adira.contact.exception.CustomNotFoundException;
 import com.adira.contact.pojo.Contact;
 import com.adira.contact.repository.ContactRepository;
 
@@ -49,12 +49,25 @@ public class ContactServiceImpl implements ContactService {
 
             return contactRepository.save(existingContact);
         } else {
-            throw new ContactNotFoundException("Contact with id " + id + " not found");
+            throw new CustomNotFoundException("Contact with id " + id + " not found");
         }
     }
 
     @Override
-    public void deleteContact(Long id) {
-        contactRepository.deleteById(id);
+    public boolean deleteContact(Long id) {
+
+        try {
+            contactRepository.deleteById(id);
+            return true; // or false
+        } catch (Exception e) {
+            // Handle any exceptions or errors during deletion
+            return false;
+        }
+
+    }
+
+    @Override
+    public boolean doesContactExistById(Long id) {
+        return contactRepository.existsById(id);
     }
 }

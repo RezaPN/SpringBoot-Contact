@@ -17,5 +17,7 @@ public interface ContactService {
 
     Contact updateContact(Long id, Contact contact);
 
-    void deleteContact(Long id);
+    boolean deleteContact(Long id);
+
+    boolean doesContactExistById (Long id);
 }

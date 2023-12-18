@@ -17,6 +17,8 @@ import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostRemove;
 import jakarta.persistence.PostUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "contact")
@@ -36,6 +38,7 @@ public class Contact {
 
     @JsonProperty("contact_name")
     @Column
+  
     private String contactName;
 
     @JsonIgnore
@@ -43,18 +46,17 @@ public class Contact {
     @JoinColumn(name = "user_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
+    
 
     public Contact() {
     }
 
     public Contact(String accountNumber, String bankName, String contactName, User user) {
-
         this.accountNumber = accountNumber;
         this.bankName = bankName;
         this.contactName = contactName;
         this.user = user;
     }
-
 
     public Long getId() {
         return this.id;
@@ -95,7 +97,6 @@ public class Contact {
     public void setUser(User user) {
         this.user = user;
     }
-
 
     @PostPersist
     private void logInsert() {
