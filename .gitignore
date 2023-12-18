@@ -1,0 +1,78 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+# Compiled class file
+*.class
+
+# Log files
+log/
+*.log
+
+# IntelliJ IDEA files
+.idea/
+
+# Eclipse files
+.classpath
+.project
+.settings/
+
+# Maven files
+target/
+
+# Spring Boot config files
+application.properties
+application.yml
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# Local configuration file (when the application.properties is not part of the repository)
+src/main/resources/application-local.properties
+
+# Spring Boot DevTools
+.restart
+
+# IDE (Eclipse/IntelliJ/NetBeans) specific files
+.metadata/
+.vscode/
+
+# Thumbs.db, ehthumbs.db
+Thumbs.db
+ehthumbs.db
+
+# Folder config for Visual Studio Code
+.vscode/
+
