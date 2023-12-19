@@ -1,4 +1,4 @@
-package com.adira.contact.pojo;
+package com.adira.contact.entity;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;

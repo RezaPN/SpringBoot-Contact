@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 
-import com.adira.contact.pojo.ApiResponse;
+import com.adira.contact.entity.ApiResponse;
 
 public class Utils {
 

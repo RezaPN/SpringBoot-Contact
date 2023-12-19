@@ -3,7 +3,7 @@ package com.adira.contact.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.adira.contact.pojo.Contact;
+import com.adira.contact.entity.Contact;
 
 import java.util.List;
 import java.util.Optional;

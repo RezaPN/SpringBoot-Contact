@@ -1,4 +1,4 @@
-package com.adira.contact.pojo;
+package com.adira.contact.entity;
 
 public class ApiResponse<T> {
     private int statusCode;

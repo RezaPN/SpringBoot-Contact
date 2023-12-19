@@ -7,8 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import com.adira.contact.dto.ContactRequestDTO;
 import com.adira.contact.dto.ContactUpdateDTO;
-import com.adira.contact.pojo.ApiResponse;
-import com.adira.contact.pojo.Contact;
+import com.adira.contact.entity.ApiResponse;
+import com.adira.contact.entity.Contact;
 
 public interface ContactService {
 

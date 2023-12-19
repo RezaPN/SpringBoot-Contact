@@ -3,10 +3,10 @@ package com.adira.contact.service;
 import com.adira.contact.common.Utils;
 import com.adira.contact.dto.ContactRequestDTO;
 import com.adira.contact.dto.ContactUpdateDTO;
+import com.adira.contact.entity.ApiResponse;
+import com.adira.contact.entity.Contact;
+import com.adira.contact.entity.User;
 import com.adira.contact.exception.CustomNotFoundException;
-import com.adira.contact.pojo.ApiResponse;
-import com.adira.contact.pojo.Contact;
-import com.adira.contact.pojo.User;
 import com.adira.contact.repository.ContactRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;

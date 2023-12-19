@@ -76,3 +76,5 @@ ehthumbs.db
 # Folder config for Visual Studio Code
 .vscode/
 
+# Ignore private key
+private_key.pem

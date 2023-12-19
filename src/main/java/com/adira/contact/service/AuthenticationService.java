@@ -2,7 +2,7 @@ package com.adira.contact.service;
 
 import java.util.Optional;
 
-import com.adira.contact.pojo.User;
+import com.adira.contact.entity.User;
 
 import io.jsonwebtoken.Claims;
 

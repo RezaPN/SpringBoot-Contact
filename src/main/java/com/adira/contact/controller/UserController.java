@@ -1,9 +1,9 @@
 package com.adira.contact.controller;
 
-import com.adira.contact.common.Utils;
 import com.adira.contact.dto.UserDTO;
-import com.adira.contact.pojo.ApiResponse;
-import com.adira.contact.pojo.User;
+import com.adira.contact.dto.UserRequestDTO;
+import com.adira.contact.entity.ApiResponse;
+import com.adira.contact.entity.User;
 import com.adira.contact.service.UserService;
 
 import jakarta.validation.Valid;
@@ -23,7 +23,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    private Utils utils = new Utils();
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> getUserById(@PathVariable Long id) {
@@ -38,30 +37,6 @@ public class UserController {
             ApiResponse<UserDTO> apiResponse = new ApiResponse<>(HttpStatus.NOT_FOUND.value(), "User not found", "API",
                     null);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
-        }
-    }
-
-    @PostMapping
-    public ResponseEntity<ApiResponse<?>> createUser(@Valid @RequestBody User user, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return utils.handleValidationErrors(bindingResult);
-        }
-
-        if (userService.doesUserExistByEmail(user.getEmail())) {
-            return ResponseEntity.badRequest().body(new ApiResponse<>(HttpStatus.BAD_REQUEST.value(),
-                    "User with this email already exists", "API", null));
-        }
-
-        User createdUser = userService.createUser(user);
-
-        if (createdUser != null) {
-            UserDTO userDTO = convertToDTO(createdUser);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new ApiResponse<>(HttpStatus.CREATED.value(), "User created", "API", userDTO));
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to create user", "API",
-                            null));
         }
     }
 

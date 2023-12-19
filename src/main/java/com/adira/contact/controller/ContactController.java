@@ -2,8 +2,8 @@ package com.adira.contact.controller;
 
 import com.adira.contact.dto.ContactRequestDTO;
 import com.adira.contact.dto.ContactUpdateDTO;
-import com.adira.contact.pojo.ApiResponse;
-import com.adira.contact.pojo.Contact;
+import com.adira.contact.entity.ApiResponse;
+import com.adira.contact.entity.Contact;
 import com.adira.contact.service.ContactService;
 import jakarta.validation.Valid;
 

@@ -2,7 +2,7 @@ package com.adira.contact.service;
 
 import java.util.Optional;
 
-import com.adira.contact.pojo.RefreshToken;
+import com.adira.contact.entity.RefreshToken;
 
 public interface RefreshTokenService {
 
