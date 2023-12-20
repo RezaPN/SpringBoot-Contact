@@ -1,18 +1,14 @@
 package com.adira.contact.controller;
 
 import com.adira.contact.dto.UserDTO;
-import com.adira.contact.dto.UserRequestDTO;
 import com.adira.contact.entity.ApiResponse;
 import com.adira.contact.entity.User;
 import com.adira.contact.service.UserService;
-
-import jakarta.validation.Valid;
 
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;

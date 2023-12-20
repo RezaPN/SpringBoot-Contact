@@ -2,6 +2,7 @@ package com.adira.contact.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
@@ -30,8 +31,11 @@ public class SecurityConfiguration extends WebSecurityConfiguration {
                 http
                                 .csrf(csrf -> csrf.disable())
                                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                                                .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login")
+                                                .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login"
+                                                               )
                                                 .permitAll()
+                                                .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**")
+                                                .hasAnyAuthority("ROLE_ADMIN")
                                                 .anyRequest().authenticated())
                                 .addFilterBefore(new ExceptionHandlerFilter(), AuthenticationFilter.class)
                                 .addFilter(authenticationFilter)

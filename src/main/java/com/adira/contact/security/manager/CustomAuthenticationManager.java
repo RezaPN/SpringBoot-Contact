@@ -1,7 +1,9 @@
 package com.adira.contact.security.manager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -14,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.adira.contact.entity.User;
+import com.adira.contact.security.AuthenticatedUserDetails;
 import com.adira.contact.service.UserService;
 
 import lombok.AllArgsConstructor;
@@ -42,6 +45,13 @@ public class CustomAuthenticationManager implements AuthenticationManager {
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
         }
 
-        return new UsernamePasswordAuthenticationToken(authentication.getName(), user.getPassword(), authorities);
+        Map<String, Object> additionalClaims = new HashMap<>();
+        additionalClaims.put("userId", user.getId());
+        additionalClaims.put("email", user.getEmail());
+
+        return new UsernamePasswordAuthenticationToken(
+                new AuthenticatedUserDetails(user.getId(), user.getEmail(), authorities),
+                user.getPassword(),
+                authorities);
     }
 }
