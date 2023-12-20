@@ -10,6 +10,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import com.adira.contact.security.filter.AuthenticationFilter;
 import com.adira.contact.security.filter.ExceptionHandlerFilter;
+import com.adira.contact.security.filter.JWTAuthorizationFilter;
 import com.adira.contact.security.manager.CustomAuthenticationManager;
 
 import lombok.AllArgsConstructor;
@@ -34,6 +35,7 @@ public class SecurityConfiguration extends WebSecurityConfiguration {
                                                 .anyRequest().authenticated())
                                 .addFilterBefore(new ExceptionHandlerFilter(), AuthenticationFilter.class)
                                 .addFilter(authenticationFilter)
+                                .addFilterAfter(new JWTAuthorizationFilter(), AuthenticationFilter.class)
                                 .sessionManagement(
                                                 sessionManagement -> sessionManagement.sessionCreationPolicy(
                                                                 SessionCreationPolicy.STATELESS));

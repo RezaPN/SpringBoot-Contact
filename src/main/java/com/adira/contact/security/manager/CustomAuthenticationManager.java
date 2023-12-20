@@ -1,10 +1,15 @@
 package com.adira.contact.security.manager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -30,6 +35,13 @@ public class CustomAuthenticationManager implements AuthenticationManager {
             throw new BadCredentialsException("You provided an incorrect email or password.");
         }
 
-        return new UsernamePasswordAuthenticationToken(authentication.getName(), user.getPassword());
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        if (user.isAdmin()) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        } else {
+            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        }
+
+        return new UsernamePasswordAuthenticationToken(authentication.getName(), user.getPassword(), authorities);
     }
 }
