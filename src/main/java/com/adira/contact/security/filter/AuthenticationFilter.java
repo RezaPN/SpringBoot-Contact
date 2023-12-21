@@ -2,9 +2,7 @@ package com.adira.contact.security.filter;
 
 import java.io.IOException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.util.Collection;
-import java.util.Date;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -21,12 +19,8 @@ import com.adira.contact.entity.ApiResponse;
 import com.adira.contact.security.AuthenticatedUserDetails;
 import com.adira.contact.security.SecurityConstants;
 import com.adira.contact.security.jwt.RSAKeyReader;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
