@@ -1,6 +1,8 @@
 package com.adira.contact.security.filter;
 
 import java.io.IOException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
@@ -18,10 +20,13 @@ import com.adira.contact.dto.UserRequestDTO;
 import com.adira.contact.entity.ApiResponse;
 import com.adira.contact.security.AuthenticatedUserDetails;
 import com.adira.contact.security.SecurityConstants;
+import com.adira.contact.security.jwt.RSAKeyReader;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -75,12 +80,24 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                                 .map(GrantedAuthority::getAuthority)
                                 .toArray(String[]::new);
 
-                String token = createToken(userId, email, authorityArray, SecurityConstants.ACCESS_TOKEN_EXPIRATION); //access token
-                String idToken = UUID.randomUUID().toString();
-                String refreshToken = createToken(userId, email, authorityArray, idToken,
-                                SecurityConstants.REFRESH_TOKEN_EXPIRATION);
+                PrivateKey privateKey = null;
+                String accessToken = null;
+                String refreshToken = null;
+                   String idToken = UUID.randomUUID().toString();
 
-                AuthToken authToken = new AuthToken(token, refreshToken);
+                try {
+                        privateKey = RSAKeyReader.getPrivateKeyFromFile("private_key.pem");
+                        accessToken = RSAKeyReader.createTokenRS256(userId, email, authorityArray,
+                                        SecurityConstants.ACCESS_TOKEN_EXPIRATION, privateKey);
+
+                        refreshToken = RSAKeyReader.createTokenRS256(userId, email, authorityArray, SecurityConstants.REFRESH_TOKEN_EXPIRATION, privateKey, idToken);
+                } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        System.out.println("Failed...");
+
+                        System.out.println(e);
+                }
+                AuthToken authToken = new AuthToken(accessToken, refreshToken);
 
                 ApiResponse<AuthToken> apiResponse = new ApiResponse<>(HttpStatus.OK.value(),
                                 "Authentication successful",
@@ -92,24 +109,5 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 response.getWriter().write(jsonResponse);
         }
 
-        private String createToken(String userId, String email, String[] authorityArray, long expirationTime) {
-                return JWT.create()
-                                .withSubject(userId)
-                                .withArrayClaim("authorities", authorityArray)
-                                .withClaim("email", email)
-                                .withExpiresAt(new Date(System.currentTimeMillis() + expirationTime))
-                                .sign(Algorithm.HMAC512(SecurityConstants.SECRET_KEY));
-        }
-
-        private String createToken(String userId, String email, String[] authorityArray, String idToken,
-                        long expirationTime) {
-                return JWT.create()
-                                .withSubject(userId)
-                                .withArrayClaim("authorities", authorityArray)
-                                .withClaim("email", email)
-                                .withClaim("idToken", idToken)
-                                .withExpiresAt(new Date(System.currentTimeMillis() + expirationTime))
-                                .sign(Algorithm.HMAC512(SecurityConstants.SECRET_KEY));
-        }
 
 }

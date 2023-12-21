@@ -31,8 +31,7 @@ public class SecurityConfiguration extends WebSecurityConfiguration {
                 http
                                 .csrf(csrf -> csrf.disable())
                                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                                                .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login"
-                                                               )
+                                                .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login")
                                                 .permitAll()
                                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**")
                                                 .hasAnyAuthority("ROLE_ADMIN")

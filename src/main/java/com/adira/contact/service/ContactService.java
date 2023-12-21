@@ -20,11 +20,11 @@ public interface ContactService {
 
     ResponseEntity<ApiResponse<?>> createContact(ContactRequestDTO contact, BindingResult bindingResult);
 
-    Contact updateContact(Long id, Contact contact);
-
     ResponseEntity<?> deleteContact( Long id);
 
     boolean doesContactExistById(Long id);
 
-    ResponseEntity<ApiResponse<Contact>> updateContactAggregate(Long id, ContactUpdateDTO contactUpdate);
+    ResponseEntity<ApiResponse<Contact>> updateContact(Long id, ContactUpdateDTO contactUpdate);
+
+    ResponseEntity<ApiResponse<List<Contact>>> findBySearchCriteria(String bankName, String accountNumber, String contactName);
 }

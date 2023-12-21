@@ -1,6 +1,7 @@
 package com.adira.contact.security.filter;
 
 import java.io.IOException;
+import java.security.PublicKey;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,12 +13,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.adira.contact.security.SecurityConstants;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
+import com.adira.contact.security.jwt.RSAKeyReader;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.auth0.jwt.interfaces.DecodedJWT;
-
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,12 +37,19 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
         try {
             String token = header.replace(SecurityConstants.BEARER, "");
-            DecodedJWT user = JWT.require(Algorithm.HMAC512(SecurityConstants.SECRET_KEY))
-                    .build()
-                    .verify(token);
 
-            List<String> authorityStrings = user.getClaim("authorities")
-                    .asList(String.class);
+            System.out.println("Get Public Key");
+            PublicKey publicKey = RSAKeyReader.getPublicKeyFromFile("public_key.pem");
+            System.out.println(publicKey);
+
+            Claims user = Jwts.parser()
+                    .verifyWith(publicKey)
+                    .build().parseSignedClaims(token).getPayload();
+
+            System.out.println("TEST");
+            System.out.println(user);
+
+            List<String> authorityStrings = user.get("authorities", List.class);
 
             List<GrantedAuthority> authorities = authorityStrings.stream()
                     .map(SimpleGrantedAuthority::new) // Mengubah string nama peran menjadi GrantedAuthority
@@ -58,6 +65,9 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
         } catch (JWTVerificationException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Invalid token");
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write(e.getMessage());
         }
 
     }

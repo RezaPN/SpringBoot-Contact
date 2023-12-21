@@ -61,12 +61,21 @@ public class ContactController {
     @PutMapping("{id}")
     public ResponseEntity<ApiResponse<Contact>> updateContact(@PathVariable Long id,
             @RequestBody ContactUpdateDTO contactUpdate) {
-        return contactService.updateContactAggregate(id, contactUpdate);
+        return contactService.updateContact(id, contactUpdate);
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteContact(@PathVariable Long id) {
         return contactService.deleteContact(id);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<Contact>>> searchContacts(
+            @RequestParam(name = "bankName", required = false) String bankName,
+            @RequestParam(name = "accountNumber", required = false) String accountNumber,
+            @RequestParam(name = "contactName", required = false) String contactName) {
+
+        return contactService.findBySearchCriteria(bankName, accountNumber, contactName);
     }
 
 }
