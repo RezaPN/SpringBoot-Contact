@@ -1,4 +1,4 @@
-package com.adira.contact.pojo;
+package com.adira.contact.entity;
 
 import java.util.List;
 
@@ -13,9 +13,6 @@ import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostRemove;
 import jakarta.persistence.PostUpdate;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "users")
@@ -26,21 +23,16 @@ public class User {
     private Long id;
 
     @Column(nullable = false)
-    @NotBlank(message = "Email must not be blank")
-    @Email(message = "Invalid email address")
     private String email;
 
     @Column(nullable = false)
-    @NotBlank(message = "Password must not be blank")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", message = "Password must contain at least 8 characters, including one uppercase letter, one lowercase letter, one digit, and one special character")
     private String password;
-    
 
     @Column(columnDefinition = "boolean default false")
     private boolean admin;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Contact> contacts;    
+    private List<Contact> contacts;
 
     public User() {
     }
@@ -49,6 +41,12 @@ public class User {
         this.email = email;
         this.password = password;
         this.admin = admin;
+    }
+
+    public User(String email, String password) {
+        this.email = email;
+        this.password = password;
+        this.admin = false;
     }
 
     public List<Contact> getContacts() {

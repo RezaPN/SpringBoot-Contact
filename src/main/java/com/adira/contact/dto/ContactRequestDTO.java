@@ -10,8 +10,6 @@ public class ContactRequestDTO {
     private String bankName;
     @NotNull(message = "Contact Name should not be Empty")
     private String contactName;
-    @NotNull(message = "User ID should not be empty")
-    private Long userId;
 
     // Constructors, getters, and setters
 
@@ -23,7 +21,6 @@ public class ContactRequestDTO {
         this.accountNumber = accountNumber;
         this.bankName = bankName;
         this.contactName = contactName;
-        this.userId = userId;
     }
 
     // Getters and setters
@@ -49,13 +46,5 @@ public class ContactRequestDTO {
 
     public void setContactName(String contactName) {
         this.contactName = contactName;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 }

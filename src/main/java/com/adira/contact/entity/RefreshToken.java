@@ -1,4 +1,4 @@
-package com.adira.contact.pojo;
+package com.adira.contact.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

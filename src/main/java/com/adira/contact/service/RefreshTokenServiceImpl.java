@@ -1,6 +1,6 @@
 package com.adira.contact.service;
 
-import com.adira.contact.pojo.RefreshToken;
+import com.adira.contact.entity.RefreshToken;
 import com.adira.contact.repository.RefreshTokenRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;

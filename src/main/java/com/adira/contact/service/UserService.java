@@ -3,8 +3,12 @@ package com.adira.contact.service;
 import java.util.Optional;
 
 import org.apache.coyote.BadRequestException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 
-import com.adira.contact.pojo.User;
+import com.adira.contact.dto.UserRequestDTO;
+import com.adira.contact.entity.ApiResponse;
+import com.adira.contact.entity.User;
 
 public interface UserService {
 
@@ -19,4 +23,6 @@ public interface UserService {
     void deleteUser(Long id);
 
     boolean doesUserExistByEmail (String email);
+
+    ResponseEntity<ApiResponse<?>> Register (UserRequestDTO user, BindingResult bindingResult);
 }

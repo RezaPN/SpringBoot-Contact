@@ -2,8 +2,8 @@ package com.adira.contact.controller;
 
 import com.adira.contact.dto.ContactRequestDTO;
 import com.adira.contact.dto.ContactUpdateDTO;
-import com.adira.contact.pojo.ApiResponse;
-import com.adira.contact.pojo.Contact;
+import com.adira.contact.entity.ApiResponse;
+import com.adira.contact.entity.Contact;
 import com.adira.contact.service.ContactService;
 import jakarta.validation.Valid;
 
@@ -61,12 +61,21 @@ public class ContactController {
     @PutMapping("{id}")
     public ResponseEntity<ApiResponse<Contact>> updateContact(@PathVariable Long id,
             @RequestBody ContactUpdateDTO contactUpdate) {
-        return contactService.updateContactAggregate(id, contactUpdate);
+        return contactService.updateContact(id, contactUpdate);
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteContact(@PathVariable Long id) {
         return contactService.deleteContact(id);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<Contact>>> searchContacts(
+            @RequestParam(name = "bankName", required = false) String bankName,
+            @RequestParam(name = "accountNumber", required = false) String accountNumber,
+            @RequestParam(name = "contactName", required = false) String contactName) {
+
+        return contactService.findBySearchCriteria(bankName, accountNumber, contactName);
     }
 
 }
