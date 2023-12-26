@@ -25,16 +25,15 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CustomAuthenticationManager implements AuthenticationManager {
 
-    private UserService userServiceImpl;
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final UserService userServiceImpl;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String email = authentication.getName(); // Get the email from the Authentication object
-        User user = userServiceImpl.getUserByEmail(email).get();
+        User user = userServiceImpl.getUserByEmail(email).orElse(null);
 
-        if (user == null
-                || !bCryptPasswordEncoder.matches(authentication.getCredentials().toString(), user.getPassword())) {
+        if (user == null || !bCryptPasswordEncoder.matches(authentication.getCredentials().toString(), user.getPassword())) {
             throw new BadCredentialsException("You provided an incorrect email or password.");
         }
 
@@ -49,8 +48,10 @@ public class CustomAuthenticationManager implements AuthenticationManager {
         additionalClaims.put("userId", user.getId());
         additionalClaims.put("email", user.getEmail());
 
+        AuthenticatedUserDetails userDetails = new AuthenticatedUserDetails(user.getId(), user.getEmail(), authorities);
+
         return new UsernamePasswordAuthenticationToken(
-                new AuthenticatedUserDetails(user.getId(), user.getEmail(), authorities),
+                userDetails,
                 user.getPassword(),
                 authorities);
     }

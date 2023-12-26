@@ -53,7 +53,7 @@ public class RSAKeyReader {
         
 
         System.out.println("Success publicKeyPem label deleted");
-        System.out.println(publicKeyPEM);
+        // System.out.println(publicKeyPEM);
 
         // Decode base64 string
         byte[] encoded = Base64.getDecoder().decode(publicKeyPEM);

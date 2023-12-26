@@ -40,14 +40,11 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
             System.out.println("Get Public Key");
             PublicKey publicKey = RSAKeyReader.getPublicKeyFromFile("public_key.pem");
-            System.out.println(publicKey);
+            // System.out.println(publicKey);
 
             Claims user = Jwts.parser()
                     .verifyWith(publicKey)
                     .build().parseSignedClaims(token).getPayload();
-
-            System.out.println("TEST");
-            System.out.println(user);
 
             List<String> authorityStrings = user.get("authorities", List.class);
 

@@ -14,14 +14,16 @@ import com.adira.contact.security.filter.ExceptionHandlerFilter;
 import com.adira.contact.security.filter.JWTAuthorizationFilter;
 import com.adira.contact.security.manager.CustomAuthenticationManager;
 
-import lombok.AllArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
-@AllArgsConstructor
 public class SecurityConfiguration extends WebSecurityConfiguration {
 
         private final CustomAuthenticationManager customAuthenticationManager;
+
+        public SecurityConfiguration(CustomAuthenticationManager customAuthenticationManager) {
+            this.customAuthenticationManager = customAuthenticationManager;
+        }    
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
