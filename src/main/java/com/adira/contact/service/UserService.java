@@ -6,7 +6,7 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 
-import com.adira.contact.dto.UserRequestDTO;
+import com.adira.contact.dto.RequestBody.UserRequestDTO;
 import com.adira.contact.entity.ApiResponse;
 import com.adira.contact.entity.User;
 

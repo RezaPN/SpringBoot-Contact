@@ -2,17 +2,13 @@ package com.adira.contact.controller;
 
 import com.adira.contact.common.LogUtils;
 import com.adira.contact.common.Utils;
-import com.adira.contact.dto.ContactRequestDTO;
-import com.adira.contact.dto.ContactUpdateDTO;
+import com.adira.contact.dto.RequestBody.ContactRequestDTO;
+import com.adira.contact.dto.ResponseBody.ContactUpdateDTO;
 import com.adira.contact.entity.ApiResponse;
 import com.adira.contact.entity.Contact;
 import com.adira.contact.service.ContactService;
 import jakarta.validation.Valid;
-import org.hibernate.NonUniqueResultException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -26,7 +22,6 @@ import org.slf4j.MDC;
 @RequestMapping("/api/v1/contacts")
 public class ContactController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ContactService.class);
     Utils utils = new Utils();
 
     @Autowired

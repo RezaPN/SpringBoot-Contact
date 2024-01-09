@@ -1,6 +1,6 @@
 package com.adira.contact.controller;
 
-import com.adira.contact.dto.UserDTO;
+import com.adira.contact.dto.ResponseBody.UserDTO;
 import com.adira.contact.entity.ApiResponse;
 import com.adira.contact.entity.User;
 import com.adira.contact.service.UserService;

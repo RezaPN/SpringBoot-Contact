@@ -1,4 +1,5 @@
-package com.adira.contact.service;
+package com.adira.contact;
+
 
 public class Example {
     public static void main(String[] args) {

@@ -17,7 +17,7 @@ import org.springframework.validation.BindingResult;
 
 import com.adira.contact.common.Constants;
 import com.adira.contact.common.Utils;
-import com.adira.contact.dto.UserRequestDTO;
+import com.adira.contact.dto.RequestBody.UserRequestDTO;
 import com.adira.contact.entity.ApiResponse;
 import com.adira.contact.entity.User;
 import com.adira.contact.exception.CustomNotFoundException;

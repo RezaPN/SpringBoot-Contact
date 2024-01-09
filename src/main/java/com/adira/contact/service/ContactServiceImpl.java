@@ -2,8 +2,9 @@ package com.adira.contact.service;
 
 import com.adira.contact.common.LogUtils;
 import com.adira.contact.common.Utils;
-import com.adira.contact.dto.ContactRequestDTO;
-import com.adira.contact.dto.ContactUpdateDTO;
+import com.adira.contact.dto.RequestBody.ContactRequestDTO;
+import com.adira.contact.dto.ResponseBody.ContactDTO;
+import com.adira.contact.dto.ResponseBody.ContactUpdateDTO;
 import com.adira.contact.entity.ApiResponse;
 import com.adira.contact.entity.Contact;
 import com.adira.contact.entity.User;
@@ -74,7 +75,9 @@ public class ContactServiceImpl implements ContactService {
         Contact contactCreated = contactRepository.save(contact);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(201, "Contact Created", "API Contact Service", contactCreated));
+                .body(new ApiResponse<>(201, "Contact Created", "API Contact Service",
+                        new ContactDTO(contactCreated.getAccountNumber(), contactCreated.getBankName(),
+                                contactCreated.getContactName())));
     }
 
     @Override

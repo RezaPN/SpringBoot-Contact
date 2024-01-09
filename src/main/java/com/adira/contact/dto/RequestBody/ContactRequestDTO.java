@@ -1,18 +1,27 @@
-package com.adira.contact.dto;
+package com.adira.contact.dto.RequestBody;
 
-public class ContactUpdateDTO {
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
+public class ContactRequestDTO {
+
+    @NotNull(message = "Account Number should not be Null")
+    @NotEmpty(message = "Account Number should not be Empty")
     private String accountNumber;
+    @NotNull(message = "Bank Name should not be Null")
+    @NotEmpty(message = "Bank Name should not be Empty")
     private String bankName;
+    @NotNull(message = "Contact Name should not be Null")
+    @NotEmpty(message = "Contact Name should not be Empty")
     private String contactName;
 
     // Constructors, getters, and setters
 
     // Constructors
-    public ContactUpdateDTO() {
+    public ContactRequestDTO() {
     }
 
-    public ContactUpdateDTO(String accountNumber, String bankName, String contactName) {
+    public ContactRequestDTO(String accountNumber, String bankName, String contactName) {
         this.accountNumber = accountNumber;
         this.bankName = bankName;
         this.contactName = contactName;

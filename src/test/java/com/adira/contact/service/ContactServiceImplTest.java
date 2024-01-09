@@ -9,7 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 
 import com.adira.contact.common.Utils;
-import com.adira.contact.dto.ContactRequestDTO;
+import com.adira.contact.dto.RequestBody.ContactRequestDTO;
 import com.adira.contact.entity.ApiResponse;
 import com.adira.contact.entity.Contact;
 import com.adira.contact.entity.User;
@@ -143,7 +143,7 @@ class ContactServiceImplTest {
     void testCreateContact() {
         Long userId = 123L;
         // Mock data
-        ContactRequestDTO contactRequest = new ContactRequestDTO("123456", "Test Bank", "John Doe", userId);
+        ContactRequestDTO contactRequest = new ContactRequestDTO("123456", "Test Bank", "John Doe");
         when(authentication.getPrincipal()).thenReturn(userId.toString());
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -175,7 +175,7 @@ class ContactServiceImplTest {
     @Test
     void testCreateContact_ValidationFailed() {
         Long userId = 123L;
-        ContactRequestDTO contactRequest = new ContactRequestDTO("123456", "", "John Doe", userId);
+        ContactRequestDTO contactRequest = new ContactRequestDTO("123456", "", "John Doe");
         when(authentication.getPrincipal()).thenReturn(userId.toString());
         when(bindingResult.hasErrors()).thenReturn(true);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -205,7 +205,7 @@ class ContactServiceImplTest {
     @Test
     void testCreateContact_UserNotPresent() {
         Long userId = 123L;
-        ContactRequestDTO contactRequest = new ContactRequestDTO("123456", "BCA", "John Doe", userId);
+        ContactRequestDTO contactRequest = new ContactRequestDTO("123456", "BCA", "John Doe");
         when(authentication.getPrincipal()).thenReturn(userId.toString());
         when(bindingResult.hasErrors()).thenReturn(false);
         SecurityContextHolder.getContext().setAuthentication(authentication);

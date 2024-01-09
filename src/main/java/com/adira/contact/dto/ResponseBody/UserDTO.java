@@ -1,4 +1,4 @@
-package com.adira.contact.dto;
+package com.adira.contact.dto.ResponseBody;
 
 public class UserDTO {
     private Long id;

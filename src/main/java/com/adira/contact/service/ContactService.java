@@ -5,8 +5,9 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import com.adira.contact.dto.ContactRequestDTO;
-import com.adira.contact.dto.ContactUpdateDTO;
+
+import com.adira.contact.dto.RequestBody.ContactRequestDTO;
+import com.adira.contact.dto.ResponseBody.ContactUpdateDTO;
 import com.adira.contact.entity.ApiResponse;
 import com.adira.contact.entity.Contact;
 

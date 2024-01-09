@@ -14,7 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.adira.contact.dto.AuthToken;
-import com.adira.contact.dto.UserRequestDTO;
+import com.adira.contact.dto.RequestBody.UserRequestDTO;
 import com.adira.contact.entity.ApiResponse;
 import com.adira.contact.security.AuthenticatedUserDetails;
 import com.adira.contact.security.SecurityConstants;
