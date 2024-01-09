@@ -5,7 +5,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
+import java.util.Optional;
 
+import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -151,5 +153,130 @@ class UserServiceImplTest {
 
         // Ensure deleteById is never called in this case
         verify(userRepository, never()).deleteById(userId);
+    }
+
+    @Test
+    void testUpdateUser() {
+        // Mock data
+        Long userId = 1L;
+        User existingUser = new User("existing@example.com", "Arisato432011@");
+        User updatedUser = new User("updated@example.com", "Arisato432011@");
+
+        // Stub userRepository behavior
+        when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(existingUser));
+        when(userRepository.save(any())).thenReturn(existingUser);
+
+        // Call the update method
+        try {
+            String result = userService.updateUser(userId, updatedUser);
+
+            // Assertions
+            verify(userRepository, times(1)).findById(userId);
+            verify(userRepository, times(1)).save(existingUser);
+            assertEquals("User Updated Successfully", result);
+
+        } catch (BadRequestException | CustomNotFoundException e) {
+            fail("Exception not expected: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void testUpdateUserNotFound() {
+        // Mock data
+        Long userId = 1L;
+        User updatedUser = new User("existing@example.com", "Arisato432011@");
+
+        // Stub userRepository behavior
+        when(userRepository.findById(userId)).thenReturn(java.util.Optional.empty());
+
+        // Call the update method and expect CustomNotFoundException
+        assertThrows(CustomNotFoundException.class, () -> userService.updateUser(userId, updatedUser));
+
+        // Assertions
+        verify(userRepository, times(1)).findById(userId);
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void testUpdateUserWithInvalidPassword() {
+        // Mock data
+        Long userId = 1L;
+        User existingUser = new User("existing@example.com", "Arisato432011@");
+        User updatedUser = new User("updated@example.com", "falsepassword");
+
+        when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(existingUser));
+
+        // Call the update method and expect BadRequestException
+        BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> userService.updateUser(userId, updatedUser));
+
+        verify(userRepository, never()).save(any());
+        assertEquals(
+                "Password must contain at least 8 characters, including one uppercase letter, one lowercase letter, one digit, and one special character",
+                exception.getMessage());
+    }
+
+    @Test
+    void testGetUserById() {
+        // Mock data
+        Long userId = 1L;
+        User expectedUser = new User("test@example.com", "Test123!");
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
+
+        // Call the getUserById method
+        Optional<User> result = userService.getUserById(userId);
+
+        // Assertions
+        verify(userRepository, times(1)).findById(userId);
+        assertTrue(result.isPresent());
+        assertEquals(expectedUser, result.get());
+    }
+
+    @Test
+    void testGetUserByIdNotFound() {
+        // Mock data
+        Long userId = 1L;
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // Call the getUserById method
+        Optional<User> result = userService.getUserById(userId);
+
+        // Assertions
+        verify(userRepository, times(1)).findById(userId);
+        assertFalse(result.isPresent());
+    }
+
+    @Test
+    void testGetUserByEmail() {
+        // Mock data
+        String email = "test@example.com";
+        User expectedUser = new User(email, "Test123!");
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(expectedUser));
+
+        // Call the getUserByEmail method
+        Optional<User> result = userService.getUserByEmail(email);
+
+        // Assertions
+        verify(userRepository, times(1)).findByEmail(email);
+        assertTrue(result.isPresent());
+        assertEquals(expectedUser, result.get());
+    }
+
+    @Test
+    void testGetUserByEmailNotFound() {
+        // Mock data
+        String email = "nonexistent@example.com";
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+        // Call the getUserByEmail method
+        Optional<User> result = userService.getUserByEmail(email);
+
+        // Assertions
+        verify(userRepository, times(1)).findByEmail(email);
+        assertFalse(result.isPresent());
     }
 }

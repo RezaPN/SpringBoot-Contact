@@ -1,14 +1,18 @@
 package com.adira.contact.dto;
 
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 public class ContactRequestDTO {
 
     @NotNull(message = "Account Number should not be Empty")
+    @NotEmpty(message = "Account Number should not be Empty")
     private String accountNumber;
     @NotNull(message = "Bank Name should not be Empty")
+    @NotEmpty(message = "Account Number should not be Empty")
     private String bankName;
     @NotNull(message = "Contact Name should not be Empty")
+    @NotEmpty(message = "Account Number should not be Empty")
     private String contactName;
 
     // Constructors, getters, and setters

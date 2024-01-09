@@ -64,13 +64,14 @@ public class UserServiceImpl implements UserService {
                 throw new BadRequestException(
                         "Password must contain at least 8 characters, including one uppercase letter, one lowercase letter, one digit, and one special character");
             } else {
-                existingUser.setPassword(user.getPassword());
+                String newPassword = passwordEncoder.encode(user.getPassword());
+                existingUser.setPassword(newPassword);
             }
         }
 
         userRepository.save(existingUser);
 
-        return "User with ID " + id + " updated successfully";
+        return "User Updated Successfully";
     }
 
     @Override

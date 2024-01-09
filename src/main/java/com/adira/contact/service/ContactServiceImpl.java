@@ -1,5 +1,6 @@
 package com.adira.contact.service;
 
+import com.adira.contact.common.LogUtils;
 import com.adira.contact.common.Utils;
 import com.adira.contact.dto.ContactRequestDTO;
 import com.adira.contact.dto.ContactUpdateDTO;
@@ -8,8 +9,7 @@ import com.adira.contact.entity.Contact;
 import com.adira.contact.entity.User;
 import com.adira.contact.exception.CustomNotFoundException;
 import com.adira.contact.repository.ContactRepository;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -23,11 +23,13 @@ import java.util.Optional;
 @Service
 public class ContactServiceImpl implements ContactService {
 
-    @Autowired
-    private ContactRepository contactRepository;
+    private final ContactRepository contactRepository;
+    private final UserService userService;
 
-    @Autowired
-    private UserService userService;
+    public ContactServiceImpl(ContactRepository contactRepository, UserService userService) {
+        this.contactRepository = contactRepository;
+        this.userService = userService;
+    }
 
     private final Utils utils = new Utils();
 
@@ -76,28 +78,17 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public ResponseEntity<?> deleteContact(Long id) {
+    public void deleteContact(Long id) {
+        LogUtils.logInfoWithTraceId("Checking does contact Exist" + id);
         if (!doesContactExistById(id)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse<>(404, "Contact Not Found", "API Contact Service", null));
+            LogUtils.logErrorWithTraceId("Contact " + id + " doesn't exist",
+                    new EmptyResultDataAccessException("Contact Not Found", 0, null));
+            throw new EmptyResultDataAccessException("Contact Not Found", 0, null);
         }
+        LogUtils.logInfoWithTraceId("Contact exist" + id);
+        // Directly delete the contact by ID
+        contactRepository.deleteById(id);
 
-        Contact contact = contactRepository.findById(id)
-                .orElseThrow(() -> new CustomNotFoundException("Contact with id " + id + " not found"));
-        User user = getUserFromJWT();
-
-        if (contact.getUser().getId() != user.getId()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new ApiResponse<>(403, "Contact not Belonging To User", "API Contact Service", null));
-        }
-
-        try {
-            contactRepository.deleteById(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>(500, "Failed to delete contact", "API Contact Service", null));
-        }
     }
 
     @Override
@@ -162,7 +153,8 @@ public class ContactServiceImpl implements ContactService {
     public ResponseEntity<ApiResponse<List<Contact>>> findBySearchCriteria(String bankName, String accountNumber,
             String contactName) {
 
-        List<Contact> contacts = contactRepository.findByCriteria(getUserFromJWT().getId(), bankName, accountNumber, contactName);
+        List<Contact> contacts = contactRepository.findByCriteria(getUserFromJWT().getId(), bankName, accountNumber,
+                contactName);
 
         if (contacts.size() == 0) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

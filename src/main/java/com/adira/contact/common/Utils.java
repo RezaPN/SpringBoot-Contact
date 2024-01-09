@@ -1,6 +1,7 @@
 package com.adira.contact.common;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -25,4 +26,12 @@ public class Utils {
         return ResponseEntity.badRequest()
                 .body(new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "Validation failed", "API", errors));
     }
+
+    public String usingRandomUUID() {
+
+        UUID randomUUID = UUID.randomUUID();
+    
+        return randomUUID.toString().replaceAll("_", "");
+    
+      }
 }

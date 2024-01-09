@@ -20,7 +20,7 @@ public interface ContactService {
 
     ResponseEntity<ApiResponse<?>> createContact(ContactRequestDTO contact, BindingResult bindingResult);
 
-    ResponseEntity<?> deleteContact( Long id);
+    void deleteContact( Long id);
 
     boolean doesContactExistById(Long id);
 

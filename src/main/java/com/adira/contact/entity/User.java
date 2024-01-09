@@ -49,6 +49,8 @@ public class User {
         this.admin = false;
     }
 
+    
+
     public List<Contact> getContacts() {
         return contacts;
     }
