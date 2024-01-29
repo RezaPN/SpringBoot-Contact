@@ -136,6 +136,13 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+    </dependency>
+
+
 
   </dependencies>
 
@@ -163,6 +170,14 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <systemPropertyVariables>
+            <jacoco-agent.destfile>target/jacoco.exec</jacoco-agent.destfile>
+          </systemPropertyVariables>
+          <excludes>
+            <exclude>src\main\java\com\adira\contact\ContactApplication.java</exclude>
+          </excludes>
+        </configuration>
       </plugin>
 
     </plugins>

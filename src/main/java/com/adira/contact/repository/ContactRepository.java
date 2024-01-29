@@ -3,6 +3,7 @@ package com.adira.contact.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.NonNull;
 
 import com.adira.contact.entity.Contact;
 import com.adira.contact.entity.User;
@@ -27,10 +28,11 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
             @Param("contactName") String contactName);
 
     List<Contact> findByUserId(Long userId);
+    
+    @NonNull
+    Optional<Contact> findById(@NonNull Long id);
 
-    Optional<Contact> findById(Long id);
+    void deleteById(@NonNull Long id);
 
-    void deleteById(Long id);
-
-    boolean existsById(Long id);
+    boolean existsById(@NonNull Long id);
 }

@@ -8,8 +8,14 @@ import com.adira.contact.dto.ResponseBody.ContactUpdateDTO;
 import com.adira.contact.entity.ApiResponse;
 import com.adira.contact.entity.Contact;
 import com.adira.contact.entity.User;
+import com.adira.contact.exception.ContactNotBelongingToUserException;
 import com.adira.contact.exception.CustomNotFoundException;
 import com.adira.contact.repository.ContactRepository;
+
+import org.apache.coyote.BadRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,19 +39,47 @@ public class ContactServiceImpl implements ContactService {
     }
 
     private final Utils utils = new Utils();
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContactServiceImpl.class);
+    LogUtils logUtils = new LogUtils(LOGGER);
 
     @Override
     public List<Contact> getAllContacts() {
-        Long userId = getUserIdFromAuthentication();
-        return contactRepository.findByUserId(userId);
+        try {
+            logUtils.logInfoWithTraceId("Getting User ID");
+            Long userId = getUserIdFromAuthentication();
+            logUtils.logInfoWithTraceId("Successfully retrieved User ID: " + userId);
+
+            logUtils.logInfoWithTraceId("Fetching all contacts for User ID from the repository");
+            List<Contact> listContact = contactRepository.findByUserId(userId);
+            logUtils.logInfoWithTraceId("Successfully fetched contacts for User ID");
+
+            return listContact;
+        } catch (Exception e) {
+            logUtils.logErrorWithTraceId("Error while fetching contacts", e);
+            throw new RuntimeException("Error while fetching contacts", e);
+        }
     }
 
     @Override
     public Contact getContactById(Long id) {
-        Long userId = getUserIdFromAuthentication();
-        User user = getUserById(userId);
-        return contactRepository.findByIdAndUser(id, user)
-                .orElseThrow(() -> new CustomNotFoundException("Contact with id " + id + " not found"));
+        try {
+            logUtils.logInfoWithTraceId("Getting User ID & user");
+            Long userId = getUserIdFromAuthentication();
+            User user = getUserById(userId);
+            logUtils.logInfoWithTraceId("Successfully retrieved User ID & User: " + userId);
+
+            logUtils.logInfoWithTraceId("Fetching contacts from id belonging to user");
+            Contact contact = contactRepository.findByIdAndUser(id, user)
+                    .orElseThrow(() -> new CustomNotFoundException("Contact with id " + id + " not found"));
+
+                    logUtils.logInfoWithTraceId("Successfully retrieved contact by ID: " + id);
+            return contact;
+        } catch (CustomNotFoundException e) {
+            throw e; // rethrow to controller
+        } catch (Exception e) {
+            logUtils.logErrorWithTraceId("Error while fetching contacts", e);
+            throw new RuntimeException("Error while fetching contacts", e);
+        }
     }
 
     @Override
@@ -54,44 +88,60 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> createContact(ContactRequestDTO contactRequest, BindingResult bindingResult) {
+    public Contact createContact(ContactRequestDTO contactRequest, BindingResult bindingResult) {
+        try {
 
-        if (bindingResult.hasErrors()) {
-            return utils.handleValidationErrors(bindingResult);
+            logUtils.logInfoWithTraceId("Get authentication and user id");
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Long userId = Long.parseLong((String) authentication.getPrincipal());
+
+            logUtils.logInfoWithTraceId("checking if user exist");
+            Optional<User> user = userService.getUserById(userId);
+            if (!user.isPresent()) {
+                logUtils.logInfoWithTraceId("user with  this userId is not found");
+                throw new CustomNotFoundException("User Not Found");
+            }
+
+            logUtils.logInfoWithTraceId("create new contact");
+            Contact contact = new Contact(contactRequest.getAccountNumber(), contactRequest.getBankName(),
+                    contactRequest.getContactName(), user.get());
+            Contact contactCreated = contactRepository.save(contact);
+            logUtils.logInfoWithTraceId("contact created");
+            // Return success response
+            return contactCreated;
+        } catch (DataAccessException e) {
+            logUtils.logErrorWithTraceId("Get Data Access Exception", e);
+            throw e;
+        } catch (Exception e) {
+            // Handle other general exceptions
+            logUtils.logErrorWithTraceId("Get Exception", e);
+            throw new RuntimeException("Unexpected error create contact", e);
         }
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Long userId = Long.parseLong((String) authentication.getPrincipal());
-
-        Optional<User> user = userService.getUserById(userId);
-        if (!user.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse<>(404, "User not found", "API Contact Service", null));
-        }
-
-        Contact contact = new Contact(contactRequest.getAccountNumber(), contactRequest.getBankName(),
-                contactRequest.getContactName(), user.get());
-
-        Contact contactCreated = contactRepository.save(contact);
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(201, "Contact Created", "API Contact Service",
-                        new ContactDTO(contactCreated.getAccountNumber(), contactCreated.getBankName(),
-                                contactCreated.getContactName())));
     }
 
     @Override
     public void deleteContact(Long id) {
-        LogUtils.logInfoWithTraceId("Checking does contact Exist" + id);
-        if (!doesContactExistById(id)) {
-            LogUtils.logErrorWithTraceId("Contact " + id + " doesn't exist",
-                    new EmptyResultDataAccessException("Contact Not Found", 0, null));
-            throw new EmptyResultDataAccessException("Contact Not Found", 0, null);
-        }
-        LogUtils.logInfoWithTraceId("Contact exist" + id);
-        // Directly delete the contact by ID
-        contactRepository.deleteById(id);
+        try {
+            logUtils.logInfoWithTraceId("Checking does contact Exist" + id);
 
+            if (!doesContactExistById(id)) {
+                logUtils.logErrorWithTraceId("Contact " + id + " doesn't exist",
+                        new CustomNotFoundException("Contact Not Found"));
+                throw new CustomNotFoundException("Contact Not Found");
+            }
+
+            logUtils.logInfoWithTraceId("Contact exist" + id);
+            // Directly delete the contact by ID
+            contactRepository.deleteById(id);
+
+        } catch (CustomNotFoundException e) {
+            logUtils.logErrorWithTraceId("Error deleting contact: " + e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            // Catch any other unexpected exceptions
+            logUtils.logErrorWithTraceId("Unexpected error deleting contact: " + e.getMessage(), e);
+            throw new RuntimeException("Unexpected error deleting contact", e);
+        }
     }
 
     @Override
@@ -113,13 +163,13 @@ public class ContactServiceImpl implements ContactService {
                 .orElseThrow(() -> new CustomNotFoundException("User with id " + userId + " not found"));
     }
 
-    public ResponseEntity<ApiResponse<Contact>> updateContact(Long id, ContactUpdateDTO contactUpdate) {
+    public Contact updateContact(Long id, ContactUpdateDTO contactUpdate)
+            throws BadRequestException {
 
         Optional<Contact> contactOptional = contactRepository.findById(id);
 
         if (!contactOptional.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse<>(404, "Contact Not Found", "API Contact Service", null));
+            throw new CustomNotFoundException("Contact Not Found");
         }
 
         Contact contact = contactOptional.get();
@@ -127,8 +177,13 @@ public class ContactServiceImpl implements ContactService {
         User user = getUserFromJWT();
 
         if (contact.getUser().getId() != user.getId()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new ApiResponse<>(403, "Contact not Belonging To User", "API Contact Service", null));
+            throw new ContactNotBelongingToUserException("Contact not Belonging To User");
+        }
+
+        if (utils.isNonEmptyString(contactUpdate.getAccountNumber())
+                || utils.isNonEmptyString(contactUpdate.getBankName())
+                || utils.isNonEmptyString(contactUpdate.getContactName())) {
+            throw new BadRequestException("Fields should not be empty or contain only whitespaces");
         }
 
         if (contactUpdate.getAccountNumber() != null) {
@@ -143,13 +198,8 @@ public class ContactServiceImpl implements ContactService {
             contact.setContactName(contactUpdate.getContactName());
         }
 
-        Contact updatedContact = contactRepository.save(contact);
+        return contactRepository.save(contact);
 
-        return updatedContact != null
-                ? ResponseEntity
-                        .ok(new ApiResponse<>(200, "Contact " + id + " Updated", "API Contact Service", updatedContact))
-                : ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(new ApiResponse<>(400, "Failed", "API Contact Service", null));
     }
 
     @Override

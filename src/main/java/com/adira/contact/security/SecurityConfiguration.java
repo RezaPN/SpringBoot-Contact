@@ -12,6 +12,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import com.adira.contact.security.filter.AuthenticationFilter;
 import com.adira.contact.security.filter.ExceptionHandlerFilter;
 import com.adira.contact.security.filter.JWTAuthorizationFilter;
+import com.adira.contact.security.filter.TraceIdFilter;
 import com.adira.contact.security.manager.CustomAuthenticationManager;
 
 
@@ -39,6 +40,7 @@ public class SecurityConfiguration extends WebSecurityConfiguration {
                                                 .hasAnyAuthority("ROLE_ADMIN")
                                                 .anyRequest().authenticated())
                                 .addFilterBefore(new ExceptionHandlerFilter(), AuthenticationFilter.class)
+                                .addFilterBefore(new TraceIdFilter(), AuthenticationFilter.class)
                                 .addFilter(authenticationFilter)
                                 .addFilterAfter(new JWTAuthorizationFilter(), AuthenticationFilter.class)
                                 .sessionManagement(

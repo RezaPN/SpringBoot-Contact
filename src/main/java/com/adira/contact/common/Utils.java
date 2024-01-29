@@ -30,8 +30,20 @@ public class Utils {
     public String usingRandomUUID() {
 
         UUID randomUUID = UUID.randomUUID();
-    
+
         return randomUUID.toString().replaceAll("_", "");
+
+    }
+
+    //Fields should not be empty or contain only whitespaces, true --> Error
+    public boolean isNonEmptyString(String value) {
+        if (value == null){
+            return false;
+        }
+
+        return value.trim().isEmpty();
+        
+    }
+
     
-      }
 }
